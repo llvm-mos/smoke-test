@@ -43,8 +43,8 @@ jobs:
       - name: Fetch the latest Windows llvm-mos release.
         if: startsWith(matrix.os, 'windows')
         run: |
-          curl -LO https://github.com/llvm-mos/llvm-mos-sdk/releases/download/prerelease/llvm-mos-windows.tar.xz
-          7z x llvm-mos-windows.tar.xz
+          curl -LO https://github.com/llvm-mos/llvm-mos-sdk/releases/download/prerelease/llvm-mos-windows.7z
+          7z x llvm-mos-windows.7z
 
       - name: Build the test suite.
         run: |
