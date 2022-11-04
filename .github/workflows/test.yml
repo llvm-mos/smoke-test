@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
       fail-fast: false
-     steps:
+    steps:
       - name: Install Ubuntu build dependencies.
         if: startsWith(matrix.os, 'ubuntu')
         run: |
