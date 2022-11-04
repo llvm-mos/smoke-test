@@ -50,7 +50,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/llvm-mos -G Ninja ..
+          cmake -DCMAKE_PREFIX_PATH=${{github.workspace}}/llvm-mos -G Ninja ..
           ninja
 
       - name: Run the test suite.
