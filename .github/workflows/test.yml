@@ -1,0 +1,62 @@
+name: Test
+concurrency: smoke
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [on-sdk-update]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+      fail-fast: false
+     steps:
+      - name: Install Ubuntu build dependencies.
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install ninja-build
+      - name: Install Windows build dependencies.
+        if: startsWith(matrix.os, 'windows')
+        run: choco install curl ninja
+      - name: Install MacOS tools
+        if: startsWith(matrix.os, 'macos')
+        run: brew update && brew install ninja
+
+      - name: Check out the test suite.
+        uses: actions/checkout@v2
+
+      - name: Fetch the latest Ubuntu llvm-mos release.
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          curl -LO https://github.com/llvm-mos/llvm-mos-sdk/releases/download/prerelease/llvm-mos-linux.tar.xz
+          tar -xvf llvm-mos-linux.tar.xz
+      - name: Fetch the latest Mac llvm-mos release.
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          curl -LO https://github.com/llvm-mos/llvm-mos-sdk/releases/download/prerelease/llvm-mos-macos.tar.xz
+          tar -xvf llvm-mos-macos.tar.xz
+      - name: Fetch the latest Windows llvm-mos release.
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          curl -LO https://github.com/llvm-mos/llvm-mos-sdk/releases/download/prerelease/llvm-mos-windows.tar.xz
+          7z x llvm-mos-windows.tar.xz
+
+      - name: Build the test suite.
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/llvm-mos \
+            -G Ninja \
+            ..
+          ninja
+
+      - name: Run the test suite.
+        run: |
+          cd build
+          ninja test
+
